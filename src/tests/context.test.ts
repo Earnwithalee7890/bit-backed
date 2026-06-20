@@ -23,12 +23,12 @@ interface StakeInfo {
 class StacksContextStateMachine {
   walletConnected = false;
   walletAddress = '';
-  stxBalance = 0;
-  talBalance = 0;
+  stxBalance: number = 0;
+  talBalance: number = 0;
   talents: TalentProfile[] = [];
   userStakeOnTalents: { [key: string]: StakeInfo } = {};
   userPassport: TalentProfile | null = null;
-  currentBlock = 120000;
+  currentBlock: number = 120000;
 
   constructor(initialTalents: TalentProfile[]) {
     this.talents = [...initialTalents];
@@ -148,16 +148,19 @@ function runContextTests() {
 
   const state = new StacksContextStateMachine(initialTalents);
 
+  const getStx = () => state.stxBalance;
+  const getTal = () => state.talBalance;
+
   // Test 1: Connect Wallet
   state.connectWallet();
-  if (!state.walletConnected || state.walletAddress !== 'SP_USER_MAINNET_ADDRESS' || state.stxBalance !== 100 || state.talBalance !== 500) {
+  if (!state.walletConnected || state.walletAddress !== 'SP_USER_MAINNET_ADDRESS' || getStx() !== 100 || getTal() !== 500) {
     throw new Error('Test 1 failed: wallet did not connect correctly');
   }
   console.log('[PASS] Test 1: Wallet connection state transitions correct.');
 
   // Test 2: Faucet Claim
   state.faucetClaim();
-  if (state.talBalance !== 1000 || state.stxBalance !== 110) {
+  if (getTal() !== 1000 || getStx() !== 110) {
     throw new Error('Test 2 failed: faucet calculation incorrect');
   }
   console.log('[PASS] Test 2: Faucet distributions updated correctly.');
@@ -165,7 +168,7 @@ function runContextTests() {
   // Test 3: Staking state updates
   state.stakeOnTalent('SP_TALENT_1', 400); // stake 400 TAL
   const stake = state.userStakeOnTalents['SP_TALENT_1'];
-  if (!stake || stake.amount !== 400 || state.talBalance !== 600 || state.stxBalance !== 109.85) {
+  if (!stake || stake.amount !== 400 || getTal() !== 600 || getStx() !== 109.85) {
     throw new Error('Test 3 failed: staking deduction or state updates incorrect');
   }
   
@@ -186,7 +189,7 @@ function runContextTests() {
 
   // Test 5: Claiming yield rewards
   state.claimRewards('SP_TALENT_1');
-  if (state.talBalance !== 608 || state.stxBalance !== 109.75) {
+  if (getTal() !== 608 || getStx() !== 109.75) {
     throw new Error('Test 5 failed: claim rewards failed to add to balance');
   }
   if (state.getPendingRewards('SP_TALENT_1') !== 0) {

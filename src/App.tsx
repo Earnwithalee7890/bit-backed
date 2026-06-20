@@ -556,11 +556,21 @@ function App() {
                       <div className="talent-stats-row">
                         <div className="talent-stat">
                           <AwardIcon size={14} color="var(--primary-glow)" />
-                          Reputation Score: <strong>{talent.reputationScore}</strong>
+                          <span>Reputation Score</span>
+                          <span className="tooltip-container">
+                            <span className="tooltip-icon">?</span>
+                            <span className="tooltip-text">A developer's trust score determined by verified profiles, links, and direct community backing.</span>
+                          </span>
+                          <span>: <strong>{talent.reputationScore}</strong></span>
                         </div>
                         <div className="talent-stat">
                           <Coins size={14} color="var(--secondary-glow)" />
-                          Backing Pool: <strong>{talent.totalBacking.toLocaleString()} TAL</strong>
+                          <span>Backing Pool</span>
+                          <span className="tooltip-container">
+                            <span className="tooltip-icon">?</span>
+                            <span className="tooltip-text">Total quantity of TAL tokens staked by backers supporting this developer's network validation.</span>
+                          </span>
+                          <span>: <strong>{talent.totalBacking.toLocaleString()} TAL</strong></span>
                         </div>
                       </div>
                     </div>
@@ -828,7 +838,13 @@ function App() {
 
                         <div className="stake-reward-row">
                           <div>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Pending Yield</div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center' }}>
+                              <span>Pending Yield</span>
+                              <span className="tooltip-container">
+                                <span className="tooltip-icon">?</span>
+                                <span className="tooltip-text">Accrued staking rewards in TAL tokens that can be claimed immediately or left to accumulate.</span>
+                              </span>
+                            </div>
                             <div style={{ fontWeight: 600, color: 'var(--success-glow)' }}>+{rewards} TAL</div>
                           </div>
                           <div style={{ display: 'flex', gap: '8px' }}>
