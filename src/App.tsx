@@ -131,6 +131,32 @@ function App() {
   // Swap state
   const [swapSTXAmount, setSwapSTXAmount] = useState<string>('10');
 
+  // Ledger state
+  interface LedgerTx {
+    txId: string;
+    type: string;
+    details: string;
+    block: number;
+    timestamp: string;
+  }
+  
+  const [ledgerTxs, setLedgerTxs] = useState<LedgerTx[]>([
+    { txId: '0x32a8cf', type: 'Register', details: '@clarity_wizard registered passport', block: 128440, timestamp: '10m ago' },
+    { txId: '0x17b2e9', type: 'Stake', details: 'Staked 5000 TAL on @clarity_wizard', block: 128442, timestamp: '8m ago' },
+    { txId: '0xef0c5f', type: 'Verify', details: '@satoshi_builder profile verified', block: 128448, timestamp: '2m ago' }
+  ]);
+
+  const addLedgerTx = (type: string, details: string) => {
+    const newTx: LedgerTx = {
+      txId: '0x' + Math.random().toString(16).substring(2, 8),
+      type,
+      details,
+      block: 128450 + Math.floor(Math.random() * 10),
+      timestamp: 'Just now'
+    };
+    setLedgerTxs(prev => [newTx, ...prev]);
+  };
+
   // Ticker to force state update for rewards timer
   const [, setTicker] = useState(0);
 
@@ -149,16 +175,19 @@ function App() {
   const handleConnect = () => {
     connectWallet();
     triggerNotification('Wallet connected successfully to Stacks Mainnet!');
+    addLedgerTx('Connect', 'Wallet connected to Stacks Mainnet');
   };
 
   const handleDisconnect = () => {
     disconnectWallet();
     triggerNotification('Wallet disconnected.');
+    addLedgerTx('Disconnect', 'Wallet disconnected');
   };
 
   const handleFaucet = () => {
     faucetClaim();
     triggerNotification('Claimed 500 TAL & 10 STX faucet tokens!');
+    addLedgerTx('Faucet', 'Claimed 500 TAL & 10 STX');
   };
 
   const handleSwap = async () => {
@@ -170,6 +199,7 @@ function App() {
     const success = await swapTokens(amount);
     if (success) {
       triggerNotification(`Swapped ${amount} STX for ${amount * 25} TAL!`);
+      addLedgerTx('Swap', `Swapped ${amount} STX for ${amount * 25} TAL`);
     } else {
       triggerNotification('Swap failed: Insufficient STX balance.');
     }
@@ -191,6 +221,7 @@ function App() {
 
     if (success) {
       triggerNotification(`Talent Passport @${regUsername} registered!`);
+      addLedgerTx('Register', `@${regUsername} registered passport`);
       // Reset form
       setRegUsername('');
       setRegBio('');
@@ -215,6 +246,7 @@ function App() {
     const success = await stakeOnTalent(selectedTalent.address, stakeAmount);
     if (success) {
       triggerNotification(`Staked ${stakeAmount} TAL on @${selectedTalent.username}!`);
+      addLedgerTx('Stake', `Staked ${stakeAmount} TAL on @${selectedTalent.username}`);
       setStakingModalOpen(false);
     } else {
       triggerNotification('Staking transaction failed. Check balance.');
@@ -225,6 +257,8 @@ function App() {
     const success = await unstakeFromTalent(talentAddress, amount);
     if (success) {
       triggerNotification(`Unstaked ${amount} TAL successfully.`);
+      const talent = talents.find(t => t.address === talentAddress);
+      addLedgerTx('Unstake', `Unstaked ${amount} TAL from @${talent?.username || 'builder'}`);
     } else {
       triggerNotification('Unstaking transaction failed.');
     }
@@ -234,6 +268,8 @@ function App() {
     const success = await claimRewards(talentAddress);
     if (success) {
       triggerNotification(`Claimed TAL rewards successfully!`);
+      const talent = talents.find(t => t.address === talentAddress);
+      addLedgerTx('Claim', `Claimed yield rewards from @${talent?.username || 'builder'}`);
     } else {
       triggerNotification('No rewards available to claim.');
     }
@@ -737,7 +773,7 @@ function App() {
                 )}
 
                 {/* Simulated faucet for tests */}
-                <div className="faucet-box">
+                <div className="faucet-box" style={{ marginTop: '12px' }}>
                   <div className="faucet-info">
                     <span className="faucet-title">Staking Faucet</span>
                     <span className="faucet-desc">Get test STX & TAL</span>
@@ -745,6 +781,27 @@ function App() {
                   <button className="btn btn-secondary" onClick={handleFaucet} style={{ padding: '8px 14px', fontSize: '0.8rem' }}>
                     Claim Faucet
                   </button>
+                </div>
+
+                {/* Transaction history ledger */}
+                <div className="glass-panel" style={{ padding: '16px', background: 'rgba(255, 255, 255, 0.01)', border: '1px solid rgba(255, 255, 255, 0.05)', marginTop: '12px' }}>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#fff', marginBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>On-Chain Event Ledger</span>
+                    <span style={{ fontSize: '0.75rem', background: 'rgba(138,43,226,0.15)', color: 'var(--primary-glow)', padding: '2px 6px', borderRadius: '4px' }}>LIVE</span>
+                  </div>
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '180px', overflowY: 'auto', paddingRight: '4px' }}>
+                    {ledgerTxs.map((tx, idx) => (
+                      <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '2px', padding: '8px', background: 'rgba(0,0,0,0.15)', borderRadius: '6px', fontSize: '0.75rem', borderLeft: '2px solid var(--primary-glow)', textAlign: 'left' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-muted)' }}>
+                          <span style={{ fontFamily: 'monospace' }}>{tx.txId}</span>
+                          <span>{tx.timestamp}</span>
+                        </div>
+                        <div style={{ color: '#fff', fontWeight: 500 }}>{tx.details}</div>
+                        <div style={{ color: 'var(--text-secondary)', fontSize: '0.7rem' }}>Block #{tx.block}</div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             ) : (
