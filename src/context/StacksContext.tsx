@@ -1,4 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { AppConfig, UserSession, showConnect } from '@stacks/connect';
+
+const appConfig = new AppConfig(['store_write', 'publish_data']);
+export const userSession = new UserSession({ appConfig });
 
 export interface TalentProfile {
   address: string;
@@ -96,6 +100,15 @@ export const StacksProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [currentBlock, setCurrentBlock] = useState(128450);
 
   useEffect(() => {
+    if (userSession.isUserSignedIn()) {
+      const userData = userSession.loadUserData();
+      setWalletConnected(true);
+      const address = userData.profile.stxAddress.mainnet || userData.profile.stxAddress.testnet;
+      setWalletAddress(address);
+      setStxBalance(124.50); // Simulated balance for active mainnet wallet
+      setTalBalance(2500);    // Simulated TAL token balance
+    }
+
     const interval = setInterval(() => {
       setCurrentBlock((prev) => prev + 1);
     }, 6000); // Progress a block every 6 seconds for testing
@@ -103,15 +116,30 @@ export const StacksProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }, []);
 
   const connectWallet = () => {
-    // Simulated Leather/Xverse Wallet Connection
-    setWalletConnected(true);
-    const mockAddress = 'SP128450STXPASS19D5W4Y21E8P8W4D4C7B38A2B';
-    setWalletAddress(mockAddress);
-    setStxBalance(250.75); // 250.75 STX
-    setTalBalance(1000);   // 1000 TAL initially
+    showConnect({
+      userSession,
+      appDetails: {
+        name: 'BitBacked',
+        icon: window.location.origin + '/favicon.svg'
+      },
+      onFinish: () => {
+        const userData = userSession.loadUserData();
+        setWalletConnected(true);
+        const address = userData.profile.stxAddress.mainnet || userData.profile.stxAddress.testnet;
+        setWalletAddress(address);
+        setStxBalance(124.50);
+        setTalBalance(2500);
+      },
+      onCancel: () => {
+        console.log('User cancelled Stacks wallet connection flow.');
+      }
+    });
   };
 
   const disconnectWallet = () => {
+    if (userSession.isUserSignedIn()) {
+      userSession.signUserOut();
+    }
     setWalletConnected(false);
     setWalletAddress('');
     setStxBalance(0);
