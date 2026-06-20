@@ -108,7 +108,8 @@ function App() {
     stakeOnTalent,
     unstakeFromTalent,
     claimRewards,
-    getPendingRewards
+    getPendingRewards,
+    swapTokens
   } = useStacks();
 
   const [activeTab, setActiveTab] = useState<'directory' | 'passport'>('directory');
@@ -126,6 +127,9 @@ function App() {
   const [regTwitter, setRegTwitter] = useState('');
   const [regTelegram, setRegTelegram] = useState('');
   const [regLinkedin, setRegLinkedin] = useState('');
+  
+  // Swap state
+  const [swapSTXAmount, setSwapSTXAmount] = useState<string>('10');
 
   // Ticker to force state update for rewards timer
   const [, setTicker] = useState(0);
@@ -155,6 +159,20 @@ function App() {
   const handleFaucet = () => {
     faucetClaim();
     triggerNotification('Claimed 500 TAL & 10 STX faucet tokens!');
+  };
+
+  const handleSwap = async () => {
+    const amount = parseFloat(swapSTXAmount);
+    if (isNaN(amount) || amount <= 0) {
+      triggerNotification('Please enter a valid STX amount.');
+      return;
+    }
+    const success = await swapTokens(amount);
+    if (success) {
+      triggerNotification(`Swapped ${amount} STX for ${amount * 25} TAL!`);
+    } else {
+      triggerNotification('Swap failed: Insufficient STX balance.');
+    }
   };
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -627,12 +645,46 @@ function App() {
             
             {walletConnected ? (
               <div className="active-stakes-list">
-                <div className="glass-panel" style={{ padding: '16px', background: 'rgba(0,191,255,0.03)', border: '1px solid rgba(0,191,255,0.1)' }}>
+                 <div className="glass-panel" style={{ padding: '16px', background: 'rgba(0,191,255,0.03)', border: '1px solid rgba(0,191,255,0.1)' }}>
                   <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Staking Overview</div>
                   <div style={{ fontSize: '1.5rem', fontWeight: 800, marginTop: '4px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Coins color="var(--secondary-glow)" size={20} />
                     {Object.values(userStakeOnTalents).reduce((sum, s) => sum + s.amount, 0).toLocaleString()} TAL
                   </div>
+                </div>
+
+                {/* Swap / Exchange Calculator */}
+                <div className="glass-panel" style={{ padding: '16px', background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.05)', marginTop: '12px' }}>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#fff', marginBottom: '8px' }}>STX to TAL Instant Swap</div>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
+                    <div style={{ flex: 1, position: 'relative' }}>
+                      <input 
+                        type="number" 
+                        value={swapSTXAmount} 
+                        onChange={(e) => setSwapSTXAmount(e.target.value)}
+                        style={{ width: '100%', padding: '8px 12px', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: '#fff', outline: 'none', fontSize: '0.85rem' }} 
+                        placeholder="STX"
+                      />
+                      <span style={{ position: 'absolute', right: '8px', top: '8px', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>STX</span>
+                    </div>
+                    <span style={{ fontSize: '1rem', color: 'var(--text-secondary)' }}>➜</span>
+                    <div style={{ flex: 1, position: 'relative' }}>
+                      <input 
+                        type="text" 
+                        value={isNaN(parseFloat(swapSTXAmount)) ? '0' : (parseFloat(swapSTXAmount) * 25).toString()} 
+                        disabled
+                        style={{ width: '100%', padding: '8px 12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '6px', color: 'var(--secondary-glow)', fontSize: '0.85rem' }} 
+                      />
+                      <span style={{ position: 'absolute', right: '8px', top: '8px', fontSize: '0.75rem', color: 'var(--secondary-glow)' }}>TAL</span>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={handleSwap}
+                    className="btn btn-primary" 
+                    style={{ width: '100%', padding: '8px 0', fontSize: '0.8rem', justifyContent: 'center', borderRadius: '6px' }}
+                  >
+                    Swap Tokens (1 STX = 25 TAL)
+                  </button>
                 </div>
 
                 <h4 style={{ fontSize: '0.95rem', marginTop: '12px', color: '#fff' }}>Your Backed Developers</h4>

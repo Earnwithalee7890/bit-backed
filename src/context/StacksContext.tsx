@@ -40,6 +40,7 @@ interface StacksContextType {
   unstakeFromTalent: (talentAddress: string, amount: number) => Promise<boolean>;
   claimRewards: (talentAddress: string) => Promise<boolean>;
   getPendingRewards: (talentAddress: string) => number;
+  swapTokens: (stxAmount: number) => Promise<boolean>;
 }
 
 const StacksContext = createContext<StacksContextType | undefined>(undefined);
@@ -151,6 +152,13 @@ export const StacksProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (!walletConnected) return;
     setTalBalance((prev) => prev + 500);
     setStxBalance((prev) => prev + 10);
+  };
+
+  const swapTokens = async (stxAmount: number): Promise<boolean> => {
+    if (!walletConnected || stxBalance < stxAmount) return false;
+    setStxBalance((prev) => prev - stxAmount);
+    setTalBalance((prev) => prev + (stxAmount * 25)); // 1 STX = 25 TAL exchange rate
+    return true;
   };
 
   const registerPassport = async (
@@ -339,7 +347,8 @@ export const StacksProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         stakeOnTalent,
         unstakeFromTalent,
         claimRewards,
-        getPendingRewards
+        getPendingRewards,
+        swapTokens
       }}
     >
       {children}
