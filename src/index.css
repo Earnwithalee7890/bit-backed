@@ -41,17 +41,18 @@ body {
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-color);
+  background: rgba(8, 8, 10, 0.5);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
+  background: linear-gradient(180deg, rgba(138, 43, 226, 0.3) 0%, rgba(0, 191, 255, 0.3) 100%);
+  border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-glow);
+  background: linear-gradient(180deg, var(--primary-glow) 0%, var(--secondary-glow) 100%);
 }
 
 /* Typography styles */
@@ -64,17 +65,18 @@ h1, h2, h3, h4 {
 /* Glassmorphism helpers */
 .glass-panel {
   background: var(--panel-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--panel-border);
   border-radius: 16px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  transition: border 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
+  transition: border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-panel:hover {
-  border-color: rgba(138, 43, 226, 0.25);
-  box-shadow: 0 8px 32px 0 rgba(138, 43, 226, 0.1);
+  border-color: rgba(138, 43, 226, 0.35);
+  box-shadow: 0 12px 40px 0 rgba(138, 43, 226, 0.15), 0 0 20px 0 rgba(0, 191, 255, 0.05);
+  transform: translateY(-2px);
 }
 
 /* General Button styles */
