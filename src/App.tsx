@@ -5,6 +5,7 @@ import {
   ShieldAlert, Award as AwardIcon
 } from 'lucide-react';
 import './App.css';
+import { ThreeDGraph } from './components/ThreeDGraph';
 
 const GithubIcon: React.FC<{ size?: number }> = ({ size = 16 }) => (
   <svg 
@@ -335,6 +336,11 @@ function App() {
           {/* Directory Tab View */}
           {activeTab === 'directory' && (
             <div>
+              {/* 3D Network Graph Visualizer */}
+              <div className="glass-panel" style={{ padding: '12px', marginBottom: '24px', background: 'rgba(138, 43, 226, 0.02)', border: '1px solid rgba(138, 43, 226, 0.06)' }}>
+                <ThreeDGraph />
+              </div>
+
               <div className="search-bar">
                 <input
                   type="text"
