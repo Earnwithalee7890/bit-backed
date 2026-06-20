@@ -115,6 +115,8 @@ function App() {
 
   const [activeTab, setActiveTab] = useState<'directory' | 'passport'>('directory');
   const [searchQuery, setSearchQuery] = useState('');
+  const [verificationFilter, setVerificationFilter] = useState<'all' | 'verified'>('all');
+  const [minReputation, setMinReputation] = useState<number>(0);
   const [stakingModalOpen, setStakingModalOpen] = useState(false);
   const [selectedTalent, setSelectedTalent] = useState<TalentProfile | null>(null);
   const [stakeAmount, setStakeAmount] = useState<number>(100);
@@ -288,10 +290,13 @@ function App() {
     }
   };
 
-  const filteredTalents = talents.filter((t) => 
-    t.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    t.bio.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredTalents = talents.filter((t) => {
+    const matchesSearch = t.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          t.bio.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesVerification = verificationFilter === 'all' || t.isVerified;
+    const matchesReputation = t.reputationScore >= minReputation;
+    return matchesSearch && matchesVerification && matchesReputation;
+  });
 
   return (
     <div className="app-container">
@@ -489,6 +494,42 @@ function App() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="search-input"
                 />
+              </div>
+
+              <div className="filter-controls">
+                <div className="filter-group">
+                  <span className="filter-label">Verification:</span>
+                  <div className="filter-btn-group">
+                    <button 
+                      className={`filter-btn ${verificationFilter === 'all' ? 'active' : ''}`}
+                      onClick={() => setVerificationFilter('all')}
+                    >
+                      All
+                    </button>
+                    <button 
+                      className={`filter-btn ${verificationFilter === 'verified' ? 'active' : ''}`}
+                      onClick={() => setVerificationFilter('verified')}
+                    >
+                      Verified Only
+                    </button>
+                  </div>
+                </div>
+
+                <div className="filter-slider-container">
+                  <span className="filter-label">Min Reputation:</span>
+                  <input 
+                    type="range" 
+                    min="0" 
+                    max="1000" 
+                    step="50"
+                    value={minReputation}
+                    onChange={(e) => setMinReputation(Number(e.target.value))}
+                    className="filter-slider"
+                  />
+                  <span style={{ fontSize: '0.8rem', color: '#fff', fontWeight: 600, minWidth: '40px' }}>
+                    {minReputation}+
+                  </span>
+                </div>
               </div>
 
               <div className="talent-list">
