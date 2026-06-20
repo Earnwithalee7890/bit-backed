@@ -478,3 +478,18 @@
   font-size: 0.75rem;
   color: var(--text-secondary);
 }
+
+/* Mobile responsive hamburger menu */
+.hamburger-btn {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .wallet-details {
+    display: none !important;
+  }
+  
+  .hamburger-btn {
+    display: inline-flex !important;
+  }
+}

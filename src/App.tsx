@@ -159,6 +159,7 @@ function App() {
 
   // Ticker to force state update for rewards timer
   const [, setTicker] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -335,7 +336,72 @@ function App() {
             </button>
           )}
         </div>
+
+        {/* Hamburger Menu Toggle for Mobile */}
+        <button 
+          className="hamburger-btn btn btn-secondary" 
+          onClick={() => setMobileMenuOpen(true)}
+          style={{ padding: '8px', borderRadius: '8px' }}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="4" y1="12" x2="20" y2="12"></line>
+            <line x1="4" y1="6" x2="20" y2="6"></line>
+            <line x1="4" y1="18" x2="20" y2="18"></line>
+          </svg>
+        </button>
       </nav>
+
+      {/* Mobile Navigation Drawer */}
+      {mobileMenuOpen && (
+        <div className="mobile-drawer glass-panel open" style={{
+          position: 'fixed',
+          top: 0,
+          right: 0,
+          width: '280px',
+          height: '100vh',
+          zIndex: 1100,
+          padding: '24px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '24px',
+          background: 'rgba(18, 18, 24, 0.98)',
+          boxShadow: '-10px 0 30px rgba(0,0,0,0.5)',
+          borderLeft: '1px solid rgba(255,255,255,0.08)'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3 style={{ background: 'var(--cyber-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>BitBacked</h3>
+            <button className="btn btn-secondary" onClick={() => setMobileMenuOpen(false)} style={{ padding: '4px 8px' }}>✕</button>
+          </div>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '20px' }}>
+            {walletConnected ? (
+              <>
+                <div style={{ padding: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px' }}>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Wallet Address</div>
+                  <div style={{ fontFamily: 'monospace', fontSize: '0.85rem', color: '#fff', marginTop: '4px', overflowWrap: 'anywhere' }}>{walletAddress}</div>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <div>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>STX Balance</span>
+                    <div style={{ fontWeight: 600 }}>{stxBalance.toFixed(2)} STX</div>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>TAL Balance</span>
+                    <div style={{ fontWeight: 600, color: 'var(--secondary-glow)' }}>{talBalance.toFixed(2)} TAL</div>
+                  </div>
+                </div>
+                <button className="btn btn-secondary" onClick={() => { handleDisconnect(); setMobileMenuOpen(false); }} style={{ width: '100%', justifyContent: 'center' }}>
+                  <LogOut size={16} /> Disconnect Wallet
+                </button>
+              </>
+            ) : (
+              <button className="btn btn-primary" onClick={() => { handleConnect(); setMobileMenuOpen(false); }} style={{ width: '100%', justifyContent: 'center' }}>
+                <Wallet size={16} /> Connect Wallet
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Hero Header */}
       <header className="hero glass-panel">
