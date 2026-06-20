@@ -38,7 +38,59 @@ const TwitterIcon: React.FC<{ size?: number }> = ({ size = 16 }) => (
     <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
   </svg>
 );
+const TelegramIcon: React.FC<{ size?: number }> = ({ size = 16 }) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    style={{ display: 'inline-block', verticalAlign: 'middle' }}
+  >
+    <path d="M21.198 2.502a1.86 1.86 0 0 0-1.935-.505L2.307 8.522a1.88 1.88 0 0 0-.102 3.433l4.952 2.154a1.88 1.88 0 0 0 1.94-.356l6.812-5.748a.2.2 0 0 1 .32.186l-5.32 6.545a1.88 1.88 0 0 0-.39 1.13v3.744c0 .874 1.05 1.32 1.68.72l2.368-2.228 3.902 2.873c.753.554 1.84.237 2.164-.693l4.52-12.872a1.88 1.88 0 0 0-.917-2.31z" />
+  </svg>
+);
 
+const LinkedinIcon: React.FC<{ size?: number }> = ({ size = 16 }) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    style={{ display: 'inline-block', verticalAlign: 'middle' }}
+  >
+    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+    <rect width="4" height="12" x="2" y="9" rx="1" />
+    <circle cx="4" cy="4" r="2" />
+  </svg>
+);
+
+const ShareIcon: React.FC<{ size?: number }> = ({ size = 16 }) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    style={{ display: 'inline-block', verticalAlign: 'middle' }}
+  >
+    <circle cx="18" cy="5" r="3" />
+    <circle cx="6" cy="12" r="3" />
+    <circle cx="18" cy="19" r="3" />
+    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+  </svg>
+);
 function App() {
   const {
     walletConnected,
@@ -71,6 +123,8 @@ function App() {
   const [regAvatar, setRegAvatar] = useState('');
   const [regGithub, setRegGithub] = useState('');
   const [regTwitter, setRegTwitter] = useState('');
+  const [regTelegram, setRegTelegram] = useState('');
+  const [regLinkedin, setRegLinkedin] = useState('');
 
   // Ticker to force state update for rewards timer
   const [, setTicker] = useState(0);
@@ -111,7 +165,9 @@ function App() {
       regBio,
       regAvatar,
       regGithub,
-      regTwitter
+      regTwitter,
+      regTelegram,
+      regLinkedin
     );
 
     if (success) {
@@ -122,6 +178,8 @@ function App() {
       setRegAvatar('');
       setRegGithub('');
       setRegTwitter('');
+      setRegTelegram('');
+      setRegLinkedin('');
     } else {
       triggerNotification('Error: Username already taken or wallet error.');
     }
@@ -325,6 +383,28 @@ function App() {
                             <TwitterIcon size={14} /> @{talent.twitter}
                           </a>
                         )}
+                        {talent.telegram && (
+                          <a href={`https://t.me/${talent.telegram}`} target="_blank" rel="noreferrer" className="talent-link">
+                            <TelegramIcon size={14} /> t.me/{talent.telegram}
+                          </a>
+                        )}
+                        {talent.linkedin && (
+                          <a href={`https://linkedin.com/in/${talent.linkedin}`} target="_blank" rel="noreferrer" className="talent-link">
+                            <LinkedinIcon size={14} /> linkedin.com/in/{talent.linkedin}
+                          </a>
+                        )}
+                        <button 
+                          className="talent-link" 
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                          onClick={() => {
+                            const text = encodeURIComponent(`Check out @${talent.username}'s developer reputation on BitBacked Stacks protocol!`);
+                            const url = encodeURIComponent(`https://github.com/Earnwithalee7890/bit-backed`);
+                            window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+                          }}
+                          title="Share Profile on Twitter"
+                        >
+                          <ShareIcon size={14} /> Share
+                        </button>
                       </div>
 
                       <div className="talent-stats-row">
@@ -412,6 +492,16 @@ function App() {
                           <TwitterIcon size={16} /> @{userPassport.twitter}
                         </a>
                       )}
+                      {userPassport.telegram && (
+                        <a href={`https://t.me/${userPassport.telegram}`} target="_blank" rel="noreferrer" className="talent-link" style={{ fontSize: '1rem' }}>
+                          <TelegramIcon size={16} /> t.me/{userPassport.telegram}
+                        </a>
+                      )}
+                      {userPassport.linkedin && (
+                        <a href={`https://linkedin.com/in/${userPassport.linkedin}`} target="_blank" rel="noreferrer" className="talent-link" style={{ fontSize: '1rem' }}>
+                          <LinkedinIcon size={16} /> linkedin.com/in/{userPassport.linkedin}
+                        </a>
+                      )}
                     </div>
 
                     <div className="talent-stats-row" style={{ borderTopColor: 'rgba(138,43,226,0.1)', paddingTop: '20px' }}>
@@ -487,6 +577,28 @@ function App() {
                         placeholder="Twitter handle"
                         value={regTwitter}
                         onChange={(e) => setRegTwitter(e.target.value)}
+                        className="form-input"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Telegram Username</label>
+                      <input
+                        type="text"
+                        placeholder="Telegram handle"
+                        value={regTelegram}
+                        onChange={(e) => setRegTelegram(e.target.value)}
+                        className="form-input"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">LinkedIn Username</label>
+                      <input
+                        type="text"
+                        placeholder="LinkedIn profile name"
+                        value={regLinkedin}
+                        onChange={(e) => setRegLinkedin(e.target.value)}
                         className="form-input"
                       />
                     </div>

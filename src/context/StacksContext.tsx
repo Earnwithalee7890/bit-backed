@@ -7,6 +7,8 @@ export interface TalentProfile {
   avatarUrl: string;
   github: string;
   twitter: string;
+  telegram?: string;
+  linkedin?: string;
   reputationScore: number;
   totalBacking: number;
   isVerified: boolean;
@@ -29,7 +31,7 @@ interface StacksContextType {
   connectWallet: () => void;
   disconnectWallet: () => void;
   faucetClaim: () => void;
-  registerPassport: (username: string, bio: string, avatarUrl: string, github: string, twitter: string) => Promise<boolean>;
+  registerPassport: (username: string, bio: string, avatarUrl: string, github: string, twitter: string, telegram?: string, linkedin?: string) => Promise<boolean>;
   stakeOnTalent: (talentAddress: string, amount: number) => Promise<boolean>;
   unstakeFromTalent: (talentAddress: string, amount: number) => Promise<boolean>;
   claimRewards: (talentAddress: string) => Promise<boolean>;
@@ -47,6 +49,8 @@ const INITIAL_TALENTS: TalentProfile[] = [
     avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
     github: 'clarity-wiz',
     twitter: 'clarity_wiz',
+    telegram: 'clarity_wiz',
+    linkedin: 'clarity-wizard-stx',
     reputationScore: 780,
     totalBacking: 6800,
     isVerified: true,
@@ -58,6 +62,8 @@ const INITIAL_TALENTS: TalentProfile[] = [
     avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200',
     github: 'sat-builds',
     twitter: 'satoshitest',
+    telegram: 'satoshitest',
+    linkedin: 'satoshi-builder',
     reputationScore: 540,
     totalBacking: 4400,
     isVerified: true,
@@ -69,6 +75,8 @@ const INITIAL_TALENTS: TalentProfile[] = [
     avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200',
     github: 'stx-pixels',
     twitter: 'design_stx',
+    telegram: 'design_stx',
+    linkedin: 'stx-designer',
     reputationScore: 320,
     totalBacking: 2200,
     isVerified: false,
@@ -122,7 +130,9 @@ export const StacksProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     bio: string,
     avatarUrl: string,
     github: string,
-    twitter: string
+    twitter: string,
+    telegram?: string,
+    linkedin?: string
   ): Promise<boolean> => {
     if (!walletConnected) return false;
     
@@ -137,6 +147,8 @@ export const StacksProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       avatarUrl: avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=200',
       github,
       twitter,
+      telegram,
+      linkedin,
       reputationScore: 100, // Starting reputation score as coded in the passport contract
       totalBacking: 0,
       isVerified: false
