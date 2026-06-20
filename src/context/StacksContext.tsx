@@ -41,6 +41,7 @@ interface StacksContextType {
   claimRewards: (talentAddress: string) => Promise<boolean>;
   getPendingRewards: (talentAddress: string) => number;
   swapTokens: (stxAmount: number) => Promise<boolean>;
+  verifyPassport: (talentAddress: string, status: boolean) => Promise<boolean>;
 }
 
 const StacksContext = createContext<StacksContextType | undefined>(undefined);
@@ -158,6 +159,26 @@ export const StacksProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (!walletConnected || stxBalance < stxAmount) return false;
     setStxBalance((prev) => prev - stxAmount);
     setTalBalance((prev) => prev + (stxAmount * 25)); // 1 STX = 25 TAL exchange rate
+    return true;
+  };
+
+  const verifyPassport = async (talentAddress: string, status: boolean): Promise<boolean> => {
+    if (!walletConnected) return false;
+    setTalents((prev) =>
+      prev.map((t) => {
+        if (t.address === talentAddress) {
+          const currentRep = t.reputationScore;
+          // Only add 50 reputation if they are becoming verified
+          const newRep = t.isVerified === status ? currentRep : (status ? currentRep + 50 : currentRep - 50);
+          return {
+            ...t,
+            isVerified: status,
+            reputationScore: newRep
+          };
+        }
+        return t;
+      })
+    );
     return true;
   };
 
@@ -348,7 +369,8 @@ export const StacksProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         unstakeFromTalent,
         claimRewards,
         getPendingRewards,
-        swapTokens
+        swapTokens,
+        verifyPassport
       }}
     >
       {children}

@@ -109,7 +109,8 @@ function App() {
     unstakeFromTalent,
     claimRewards,
     getPendingRewards,
-    swapTokens
+    swapTokens,
+    verifyPassport
   } = useStacks();
 
   const [activeTab, setActiveTab] = useState<'directory' | 'passport'>('directory');
@@ -157,9 +158,9 @@ function App() {
     setLedgerTxs(prev => [newTx, ...prev]);
   };
 
-  // Ticker to force state update for rewards timer
   const [, setTicker] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isAdminMode, setIsAdminMode] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -276,6 +277,17 @@ function App() {
     }
   };
 
+  const handleVerifyBuilder = async (talentAddress: string) => {
+    const success = await verifyPassport(talentAddress, true);
+    if (success) {
+      const talent = talents.find(t => t.address === talentAddress);
+      triggerNotification(`Verified @${talent?.username || 'builder'} profile!`);
+      addLedgerTx('Verify', `Verified passport of @${talent?.username || 'builder'} (Owner)`);
+    } else {
+      triggerNotification('Verification failed.');
+    }
+  };
+
   const filteredTalents = talents.filter((t) => 
     t.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
     t.bio.toLowerCase().includes(searchQuery.toLowerCase())
@@ -326,6 +338,14 @@ function App() {
               <div className="btn btn-secondary" style={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>
                 {walletAddress.substring(0, 6)}...{walletAddress.substring(walletAddress.length - 4)}
               </div>
+              <button 
+                className={`btn ${isAdminMode ? 'btn-primary' : 'btn-secondary'}`}
+                style={{ fontSize: '0.85rem', padding: '6px 12px' }}
+                onClick={() => setIsAdminMode(!isAdminMode)}
+                title="Toggle Stacks Smart Contract Owner Controls"
+              >
+                Owner Mode: {isAdminMode ? 'ON' : 'OFF'}
+              </button>
               <button className="btn btn-secondary" onClick={handleDisconnect} title="Disconnect Wallet">
                 <LogOut size={16} />
               </button>
@@ -869,6 +889,37 @@ function App() {
                     ))}
                   </div>
                 </div>
+
+                {/* Owner Admin Controls panel in sidebar */}
+                {isAdminMode && (
+                  <div className="glass-panel" style={{ padding: '16px', background: 'rgba(138,43,226,0.05)', border: '1px solid rgba(138, 43, 226, 0.15)', marginTop: '12px' }}>
+                    <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#fff', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--primary-glow)', display: 'inline-block' }} />
+                      Contract Owner Controls
+                    </div>
+                    
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', textAlign: 'left' }}>
+                      {talents.filter(t => !t.isVerified).length > 0 ? (
+                        talents.filter(t => !t.isVerified).map(t => (
+                          <div key={t.address} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px', background: 'rgba(0,0,0,0.2)', borderRadius: '6px', fontSize: '0.8rem' }}>
+                            <span>@{t.username}</span>
+                            <button 
+                              onClick={() => handleVerifyBuilder(t.address)}
+                              className="btn btn-success" 
+                              style={{ padding: '4px 8px', fontSize: '0.75rem' }}
+                            >
+                              Approve
+                            </button>
+                          </div>
+                        ))
+                      ) : (
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textAlign: 'center', padding: '8px 0' }}>
+                          All builders verified!
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div style={{ textAlign: 'center', padding: '32px 0', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
